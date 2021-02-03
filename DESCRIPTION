@@ -1,7 +1,7 @@
 Package: crimeutils
 Title: A Comprehensive Set of Functions to Clean, Analyze, and Present
         Crime Data
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: person("Jacob", "Kaplan",
     email = "jkkaplan6@gmail.com",
     role = c("aut", "cre"),
@@ -10,8 +10,8 @@ Description: A collection of functions that make it easier to understand crime (
     data, and assist others in understanding it. The package helps you read data 
     from various sources, clean it, fix column names, and graph the data. 
 Depends: R (>= 2.10)
-Imports: dplyr, ggplot2, gridExtra, scales, magrittr, gt, grDevices,
-        tidyr, stats, methods
+Imports: dplyr, ggplot2, readr, gridExtra, scales, magrittr, gt,
+        grDevices, tidyr, stats, methods, rlang
 License: MIT + file LICENSE
 LazyData: TRUE
 URL: https://github.com/jacobkap/crimeutils/
@@ -20,8 +20,8 @@ RoxygenNote: 7.1.1
 Suggests: spelling, testthat (>= 2.1.0), covr
 Language: en-US
 NeedsCompilation: no
-Packaged: 2020-10-29 23:28:17 UTC; user
+Packaged: 2021-02-03 13:58:16 UTC; jkkap
 Author: Jacob Kaplan [aut, cre] (<https://orcid.org/0000-0002-0601-0387>)
 Maintainer: Jacob Kaplan <jkkaplan6@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-10-30 05:40:02 UTC
+Date/Publication: 2021-02-03 14:40:02 UTC

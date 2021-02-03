@@ -115,6 +115,10 @@ time_series_data_graph <- function(data,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' scatterplot_data_graph(mtcars, numeric_variable1 = "mpg", numeric_variable2 = "disp",
+#' group_variable = "gear", file_name = "test.pdf")
+#' }
 scatterplot_data_graph <- function(data,
                                    numeric_variable1,
                                    numeric_variable2,
@@ -192,12 +196,12 @@ make_stat_count_plots <- function(data,
     p <-
       p +
       ggplot2::stat_count() +
-      ggplot2::scale_y_continuous(label = scales::comma)
+      ggplot2::scale_y_continuous(labels = scales::comma)
   } else {
     p <-
       p +
       ggplot2::stat_count(ggplot2::aes_string(y = "(..count..)/sum(..count..)")) +
-      ggplot2::scale_y_continuous(label = scales::percent)
+      ggplot2::scale_y_continuous(labels = scales::percent)
   }
   return(p)
 }
@@ -230,7 +234,7 @@ make_barplots <- function(data,
                           title = NULL,
                           ylab = NULL) {
 
-
+  data <- data.frame(data)
   data$temp <- factor(data[, column],
                       levels = names(sort(table(data[, column]), decreasing = FALSE)))
 
@@ -247,14 +251,97 @@ make_barplots <- function(data,
     p <-
       p +
       ggplot2::geom_bar() +
-      ggplot2::scale_y_continuous(label = scales::comma)
+      ggplot2::scale_y_continuous(labels = scales::comma, expand = c(0, 0.1))
   } else {
-  p <-
-    p +
-    ggplot2::geom_bar(ggplot2::aes_string(y = "(..count..)/sum(..count..)")) +
-    ggplot2::scale_y_continuous(label = scales::percent)
+    p <-
+      p +
+      ggplot2::geom_bar(ggplot2::aes_string(y = "(..count..)/sum(..count..)")) +
+      ggplot2::scale_y_continuous(labels = scales::percent, expand = c(0, .1))
   }
   return(p)
 }
+
+#' Create a line graph with 95\% confidence interval bars
+#'
+#' @param data
+#' A data.frame with the data you want to graph
+#' @param x_col
+#' A string with the name of the x-axis column
+#' @param y_col
+#' A string with the name of the y-axis column
+#' @param confidence_interval_error_bars
+#' A boolean (default TRUE) for whether to include 95\% confidence intervals
+#' or not.
+#' @param mean_line
+#' If TRUE (default) willadd a dashed line with the overall mean.
+#' @param type
+#' A string for whether it should make a linegraph ("line", default) or a bargraph ("bar")
+#' @return
+#' A ggplot object. Also prints the graph to the Plots panel.
+#' @export
+#'
+#' @examples
+#' data = data.frame(x = sample(15:25, size = 200, replace = TRUE),
+#' y = sample(1:100, size = 200, replace = TRUE))
+#' make_average_graph(data, "x", "y")
+#' make_average_graph(data, "x", "y", confidence_interval_error_bars  = FALSE)
+#' make_average_graph(data, "x", "y", type = "bar", mean_line = FALSE)
+#' make_average_graph(data, "x", "y", confidence_interval_error_bars  = FALSE, type = "bar")
+make_average_graph <- function(data,
+                               x_col,
+                               y_col,
+                               confidence_interval_error_bars  = TRUE,
+                               mean_line = TRUE,
+                               type = c("line", "bar")) {
+
+  if (all(type == c("line", "bar"))) {
+    type = "line"
+  }
+
+  data <- data.frame(data)
+  data_grouped <- data %>%
+    dplyr::group_by_at(x_col) %>%
+    dplyr::summarize_at(.vars = y_col, .funs = mean)
+  data_grouped <- as.data.frame(data_grouped)
+  if (confidence_interval_error_bars) {
+
+    data_grouped$lower_bound <- NA
+    data_grouped$upper_bound <- NA
+    for (i in 1:nrow(data_grouped)) {
+      temp <- data[data[, x_col] %in% data_grouped[i, x_col], ]
+      temp <- temp[, y_col]
+      lower_bound <- mean(temp) - (1.96 * (stats::sd(temp) / sqrt(length(temp))))
+      upper_bound <- mean(temp) + (1.96 * (stats::sd(temp) / sqrt(length(temp))))
+
+      data_grouped$lower_bound[i] <- lower_bound
+      data_grouped$upper_bound[i] <- upper_bound
+    }
+  }
+
+
+  if (type == "line") {
+    p <- ggplot2::ggplot(data_grouped, ggplot2::aes_string(x = x_col, y = y_col)) +
+      ggplot2::geom_line(size = 1.05)
+  } else if (type == "bar") {
+    p <- ggplot2::ggplot(data_grouped, ggplot2::aes_string(x = x_col, y = y_col)) +
+      ggplot2::geom_col(size = 1.05)
+  }
+
+  if (mean_line) {
+    p <- p + ggplot2::geom_hline(yintercept = mean(data[, y_col]),
+                                 size = 1,
+                                 linetype = 'dashed')
+  }
+
+
+  if (confidence_interval_error_bars) {
+    p <- p + ggplot2::geom_errorbar(ggplot2::aes(ymin = lower_bound,
+                                                 ymax = upper_bound),
+                                    size = 1.05)
+  }
+
+  return(p)
+}
+
 
 

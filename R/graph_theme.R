@@ -14,7 +14,7 @@
 #'   scale_linetype_crim() +
 #'   theme_crim()
 scale_linetype_crim <- function(...) {
-  return(ggplot2::scale_linetype_manual(..., values = c(1,3, 5, 2, 4, 6)))
+  return(ggplot2::scale_linetype_manual(..., values = c(1, 3, 5, 2, 4, 6)))
 
 }
 
@@ -95,8 +95,8 @@ theme_crim <- function() {
                  panel.border      = ggplot2::element_blank(),
                  axis.line         = ggplot2::element_line(colour = "black",
                                                            size = ggplot2::rel(1)),
-                 panel.grid.major  = ggplot2::element_line(colour = "grey"),
-                 panel.grid.minor  = ggplot2::element_blank(),
+                 panel.grid.major  = ggplot2::element_line(colour = "grey", size = 1.02),
+                 panel.grid.minor  = ggplot2::element_line(colour = "grey"),
                  text              = ggplot2::element_text(size = 15,
                                                            family = "serif"),
                  plot.background   = ggplot2::element_rect(fill="white",
